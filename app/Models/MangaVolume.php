@@ -10,14 +10,12 @@ class MangaVolume extends Model
     use HasFactory;
 
     protected $fillable = [
-        "number",
-        "manga_id",
-        "cover",
-        "amazon_link"
     ];
 
     protected $hidden = [
-        'user_id'  
+        'user_id',
+        'created_at',
+        'updated_at'
     ];
 
     public function users(){

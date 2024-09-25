@@ -22,7 +22,9 @@ class Manga extends Model
 
     protected $hidden = [
         'user_id',
-        'created_at'
+        'created_at',
+        'updated_at',
+        'pivot'
     ];
 
     public function users(){
@@ -45,6 +47,11 @@ class Manga extends Model
 
     public function collections(){
         return $this->belongsToMany(Collection::class,'collection_manga');
+    }
+
+    public function scopeWhereName($query, $name)
+    {
+        return $query->where('name', 'like', "%{$name}%");
     }
     
 }

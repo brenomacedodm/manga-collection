@@ -1,4 +1,4 @@
-Visão Geral
+Visão Geral:
 O projeto Manga Collection foi desenvolvido como um teste técnico para a empresa Capyba, com o objetivo de demonstrar habilidades em Laravel, desenvolvimento de APIs e boas práticas de desenvolvimento. A aplicação permite gerenciar informações sobre mangás, autores, gêneros, volumes e usuários.
 
 Tecnologias Utilizadas

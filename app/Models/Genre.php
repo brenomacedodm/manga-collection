@@ -14,8 +14,10 @@ class Genre extends Model
     ];
 
     protected $hidden = [
-        'pivot', 
-        'user_id'
+        'user_id',
+        'created_at',
+        'updated_at',
+        'pivot'
     ];
 
     public function users(){

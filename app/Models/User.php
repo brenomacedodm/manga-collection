@@ -50,8 +50,8 @@ class User extends Authenticatable
     public function authors(){
         return $this->hasMany(Author::class);
     }
-    public function collections(){
-        return $this->hasMany(Collection::class);
+    public function collection(){
+        return $this->hasOne(Collection::class);
     }
     public function genres(){
         return $this->hasMany(Genre::class);

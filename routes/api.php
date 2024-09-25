@@ -25,5 +25,5 @@ Route::post("/logout", [UsersController::class, "logout"])->middleware("auth:san
 Route::post("/mangas/authors/{manga}", [MangasController::class, "updateAuthors"])->middleware("auth:sanctum");
 Route::post("/mangas/genres/{manga}", [MangasController::class, "updateGenres"])->middleware("auth:sanctum");
 
-Route::post("/collections/{collection}/manga", [CollectionsController::class, "addManga"])->middleware("auth:sanctum");
-Route::post("/collections/{collection_manga}/volume", [CollectionsController::class, "addVolume"])->middleware("auth:sanctum");
+Route::post("/collections/addManga", [CollectionsController::class, "addManga"])->middleware("auth:sanctum");
+Route::post("/collections/addVolume", [CollectionsController::class, "addVolume"])->middleware("auth:sanctum");

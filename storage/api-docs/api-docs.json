@@ -238,6 +238,214 @@
                 ]
             }
         },
+        "/collections": {
+            "get": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Index",
+                "operationId": "681fd33b7315984b62d1baba6d04cb69",
+                "parameters": [
+                    {
+                        "name": "ordering",
+                        "in": "query",
+                        "description": "Parameter to order results",
+                        "required": false
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Parameter that set the page",
+                        "required": false
+                    },
+                    {
+                        "name": "page_size",
+                        "in": "query",
+                        "description": "Parameter that set the size of the result collection",
+                        "required": false
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Parameter that filter the name of the mangas in youe collection",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of mangas in your collection"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Store",
+                "operationId": "2d02fbd3507d521d55dcfecf67083f25",
+                "responses": {
+                    "200": {
+                        "description": "Collection started successfully"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Not allowed"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Destroy",
+                "operationId": "997ec63965090af09f7ed5f0b1595fdd",
+                "responses": {
+                    "200": {
+                        "description": "Collection deleted successfully"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Not allowed"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/collections/{manga_id}": {
+            "get": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Index",
+                "operationId": "268bb61311f2db218a75ae6a92852422",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Parameter that set the page",
+                        "required": false
+                    },
+                    {
+                        "name": "page_size",
+                        "in": "query",
+                        "description": "Parameter that set the size of the result collection",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List all volumes of a mangas and indicates if each is in your collection"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/collections/addManga": {
+            "post": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Store",
+                "description": "Add the volumes from the indicated manga to your collection, if the field volumes is not sended it'll add all the manga volumes to your collection",
+                "operationId": "37781234bea33d5aa7b140bd2c6f5c2e",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "genre",
+                                    "author",
+                                    "publisher_id",
+                                    "on_going",
+                                    "volumes"
+                                ],
+                                "properties": {
+                                    "manga": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "1"
+                                    },
+                                    "volumes": {
+                                        "type": "integer",
+                                        "example": "[1,2]"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Manga added to your collection successfully"
+                    },
+                    "422": {
+                        "description": "Field Error"
+                    },
+                    "401": {
+                        "description": "Not allowed"
+                    },
+                    "499": {
+                        "description": "Not allowed"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "498": {
+                        "description": "Email not verified"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/genres": {
             "get": {
                 "tags": [
@@ -1200,6 +1408,10 @@
         {
             "name": "Authors",
             "description": "Authors"
+        },
+        {
+            "name": "Collections",
+            "description": "Collections"
         },
         {
             "name": "Genres",

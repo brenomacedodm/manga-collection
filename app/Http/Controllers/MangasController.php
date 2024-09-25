@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Collection;
 use App\Models\Manga;
-use Gate;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
