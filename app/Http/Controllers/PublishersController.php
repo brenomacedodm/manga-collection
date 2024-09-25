@@ -16,7 +16,41 @@ class PublishersController extends Controller implements HasMiddleware
     }
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/publishers",
+     *     tags={"Publishers"},
+     *     summary="Index",
+     *     @OA\Parameter(
+     *          name="ordering",
+     *          in="query",
+     *          description="Parameter to order results",
+     *          required=false,
+     *      ),
+     *     @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          description="Parameter that set the page",
+     *          required=false,
+     *      ),
+     *     @OA\Parameter(
+     *          name="page_size",
+     *          in="query",
+     *          description="Parameter that set the size of the result collection",
+     *          required=false,
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="List of publishers"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function index(Request $request)
     {
@@ -42,65 +76,232 @@ class PublishersController extends Controller implements HasMiddleware
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/publishers",
+     *     security={{"bearerAuth":{}}},
+     *     tags={"Publishers"},
+     *     summary="Store",
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"name"},
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="publisher_link", type="string"),
+     *              )       
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Publisher created successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=422, 
+     *          description="Field Error"
+     *      ),
+     *     @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=499, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function store(Request $request)
     {
 
-        if(!$request->isAdmin) return response("You don't have permission to create publishers", 401);
-        
+        if(!$request->isAdmin) return response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to create publishers",
+                'data' => []
+            ],
+             499
+            );        
+
         $fields = $request->validate([
             'name'=> 'required|max:255',
             'publisher_link' => 'max:255'
         ]);
 
         $request->user()->publishers()->create($fields);
-        return [
+        return response()->json([
             'status' => true,
-            'message' => "Publisher created successfully"
-        ];
+            'message' => "Publisher created successfully",
+            'data' => []
+        ]);
 
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/publishers/{publisher_id}",
+     *     tags={"Publishers"},
+     *     summary="Show",
+     *     @OA\Parameter(
+     *          name="publisher_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Return the requested publisher"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *      @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function show(Publisher $publisher)
     {
-        return [$publisher];
+        return response()->json([
+            'status' => true,
+            'message' => "Publisher found successfully",
+            'data' => [$publisher]
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Patch(
+     *     path="/publishers/{publisher_id}",
+     *     security={{"bearerAuth":{}}},
+     *     tags={"Publishers"},
+     *     summary="Update",
+     *     @OA\Parameter(
+     *          name="publisher_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"name"},
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="publisher_link", type="string"),
+     *              )       
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Publisher updated successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=499, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     *     @OA\Response(
+     *          response=500, 
+     *          description="Not allowed"
+     *      ),
+     * )
      */
     public function update(Request $request, Publisher $publisher)
     {
-        if(!$request->isAdmin) return response("You don't have permission to update publishers", 401);
-        
+        if(!$request->isAdmin) return response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to update publishers",
+                'data' => []
+            ],
+             499
+            );         
         $fields = $request->validate([
             'name'=> 'required|max:255',
             'publisher_link' => 'max:255'
         ]);
 
         $publisher->update($fields);
-        return [
+        return response()->json([
             'status'=> true,	
-            'message'=> 'Publisher updated successfully'
-        ];
+            'message'=> 'Publisher updated successfully',
+            'data' => []
+        ]);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/publishers/{publisher_id}",
+     *     tags={"Publishers"},     
+     *     security={{"bearerAuth":{}}},
+     *     summary="Destroy",
+     *     @OA\Parameter(
+     *          name="publisher_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Publisher deleted successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *      @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function destroy(Request $request, Publisher $publisher )
     {
-        if(!$request->isAdmin) return response("You don't have permission to delete publishers", 401);
-
+        if(!$request->isAdmin) return response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to delete publishers",
+                'data' => []
+            ],
+             499
+            ); 
         $publisher->delete();
-        return [
+        return response()->json([
             'status'=> true,
-            'message'=> 'Publisher deleted successfully'
-        ];
+            'message'=> 'Publisher deleted successfully',
+            'data' => []
+        ]);
 
     }
 }

@@ -19,12 +19,40 @@ class AuthorsController extends Controller implements HasMiddleware
 
 
     /**
-     * @SWG\Get(
+     * @OA\Get(
      *     path="/authors",
-     *     summary="Get a list of authors",
      *     tags={"Authors"},
-     *     @SWG\Response(response=200, description="list of authors"),
-     *     @SWG\Response(response=400, description="Invalid request")
+     *     summary="Index",
+     *     @OA\Parameter(
+     *          name="ordering",
+     *          in="query",
+     *          description="Parameter to order results",
+     *          required=false,
+     *      ),
+     *     @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          description="Parameter that set the page",
+     *          required=false,
+     *      ),
+     *     @OA\Parameter(
+     *          name="page_size",
+     *          in="query",
+     *          description="Parameter that set the size of the result collection",
+     *          required=false,
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="List of authors"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
      * )
      */
     public function index(Request $request)
@@ -51,11 +79,59 @@ class AuthorsController extends Controller implements HasMiddleware
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/authors",
+     *     security={{"bearerAuth":{}}},
+     *     tags={"Authors"},
+     *     summary="Store",
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"name"},
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="picture", type="string"),
+     *              )       
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Author created successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=422, 
+     *          description="Field Error"
+     *      ),
+     *     @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=499, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function store(Request $request)
     {
-        if(!$request->isAdmin) return response("You don't have permission to create authors", 401);
+        if(!$request->isAdmin) return response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to create authors",
+                'data' => []
+            ],
+             499
+            );
 
         $fields = $request->validate([
             'name'=> 'required|max:255',
@@ -63,43 +139,157 @@ class AuthorsController extends Controller implements HasMiddleware
         ]);
 
         $request->user()->authors()->create($fields);
-        return [
+
+        return response()->json([
             'status' => true,
-            'message' => "Author created successfully"
-        ];
+            'message' => "Author created successfully",
+            'data' => []
+        ]);
         
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/authors/{author_id}",
+     *     tags={"Authors"},
+     *     summary="Show",
+     *     @OA\Parameter(
+     *          name="author_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Return the requested author"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *      @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function show(Author $author)
     {
-        return [$author];
+        return response()->json([
+            'status' => true,
+            'message' => "Author found successfully",
+            'data' => [$author]
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Patch(
+     *     path="/authors/{author_id}",
+     *     security={{"bearerAuth":{}}},
+     *     tags={"Authors"},
+     *     summary="Update",
+     *     @OA\Parameter(
+     *          name="author_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"name"},
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="picture", type="string"),
+     *              )       
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Author updated successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=499, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     *     @OA\Response(
+     *          response=500, 
+     *          description="Not allowed"
+     *      ),
+     * )
      */
     public function update(Request $request, Author $authors)
     {
-        if(!$request->is_admin) return response("You don't have permission to update authors", 401);
-
+        if(!$request->isAdmin) return 
+        response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to update authors",
+                'data' => []
+            ],
+             499
+        );
         
         $fields = $request->validate([
             'name'=> 'required|max:255',
-            'publisher_link' => 'max:255'
+            'picture' => 'max:255'
         ]);
 
         $authors->update($fields);
         return [
-            'status'=> true,	
-            'message'=> 'Author updated successfully'
+            'status' => true,	
+            'message' => 'Author updated successfully',
+            'data' => []
         ];
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/authors/{author_id}",
+     *     tags={"Authors"},     
+     *     security={{"bearerAuth":{}}},
+     *     summary="Destroy",
+     *     @OA\Parameter(
+     *          name="author_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Author deleted successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *      @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function destroy(Request $request, Author $authors)
     {
@@ -108,7 +298,8 @@ class AuthorsController extends Controller implements HasMiddleware
         $authors->delete();
         return [
             'status'=> true,
-            'message'=> 'Author deleted successfully'
+            'message'=> 'Author deleted successfully',
+            'data' => []
         ];
     }
 }

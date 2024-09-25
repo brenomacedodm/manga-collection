@@ -17,6 +17,43 @@ class UsersController extends Controller
         return '';
     }
     
+    /**
+     * @OA\Post(
+     *     path="/register",
+     *     tags={"Users"},
+     *     summary="Register",
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"name", "email", "password", "password_confirmation"},
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="email", type="string"),
+     *                  @OA\Property(property="password", type="string"),
+     *                  @OA\Property(property="password_confirmation", type="string"),
+     *              )       
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="User created successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=422, 
+     *          description="Field Error"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
+     */
     public function register(Request $request)
     {
         $user = $request->validate([
@@ -29,17 +66,52 @@ class UsersController extends Controller
 
         $token = $user->createToken($request->name);
 
-        return [
+        return response()->json([
             'status' => true, 
             'message'=> 'User created successfully',
-            'token' => $token->plainTextToken
-        ];
+            'data' => []
+        ]);
     }
 
     public function verifyEmail(Request $request){
         
     }
 
+    /**
+     * @OA\Post(
+     *     path="/login",
+     *     tags={"Users"},
+     *     summary="Login",
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"email", "password"},
+     *                  @OA\Property(property="email", type="string"),
+     *                  @OA\Property(property="password", type="string"),
+     *              )       
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Logged in successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=422, 
+     *          description="Field Error"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -60,10 +132,48 @@ class UsersController extends Controller
 
         return [
             'status' => true, 
-            'message'=> 'You are logged in',
-            'token' => $token->plainTextToken
+            'message' => 'You are logged in',
+            'data' => [
+                'token' => $token->plainTextToken
+            ]
         ];
     }
+
+    /**
+     * @OA\Post(
+     *     path="/logout",
+     *     tags={"Users"},
+     *     summary="Logout",
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"email", "password"},
+     *                  @OA\Property(property="email", type="string"),
+     *                  @OA\Property(property="password", type="string"),
+     *              )       
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Logged out successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=422, 
+     *          description="Field Error"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
+     */
     public function logout(Request $request)
     {
 
@@ -86,7 +196,7 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $id)
     {
         //
     }

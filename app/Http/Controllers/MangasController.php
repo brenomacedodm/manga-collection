@@ -19,7 +19,41 @@ class MangasController extends Controller implements HasMiddleware
     }
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/mangas",
+     *     tags={"Mangas"},
+     *     summary="Index",
+     *     @OA\Parameter(
+     *          name="ordering",
+     *          in="query",
+     *          description="Parameter to order results",
+     *          required=false,
+     *      ),
+     *     @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          description="Parameter that set the page",
+     *          required=false,
+     *      ),
+     *     @OA\Parameter(
+     *          name="page_size",
+     *          in="query",
+     *          description="Parameter that set the size of the result collection",
+     *          required=false,
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="List of mangas"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function index(Request $request)
     {
@@ -52,16 +86,69 @@ class MangasController extends Controller implements HasMiddleware
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/mangas",
+     *     security={{"bearerAuth":{}}},
+     *     tags={"Mangas"},
+     *     summary="Store",
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  required={"name"},
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="genre", type="array", @OA\Items(type="integer")),
+     *                  @OA\Property(property="author", type="integer"),
+     *                  @OA\Property(property="publisher_id", type="integer"),
+     *                  @OA\Property(property="on_going", type="boolean"),
+     *                  @OA\Property(property="volumes", type="integer")
+     *              )       
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Manga created successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=422, 
+     *          description="Field Error"
+     *      ),
+     *     @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=499, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function store(Request $request)
     {
 
-        if(!$request->isAdmin) return response("You don't have permission to create mangas", 401);
         
+        if(!$request->isAdmin) return response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to create mangas",
+                'data' => []
+            ],
+            499
+        );         
+
         $fields = $request->validate([
             'name'=> 'required|max:255',
-            'genre' => 'required',
+            'genre' => 'array|required',
             'author' => 'required',
             'publisher_id' => 'required',
             'on_going' => 'int',
@@ -69,6 +156,8 @@ class MangasController extends Controller implements HasMiddleware
             'about' => 'max:255',
             'volumes' => 'required',
         ]);
+
+        return $fields;
 
         $manga = $request->user()->mangas()->create($fields);
         $manga->authors()->attach($request->author);
@@ -78,32 +167,122 @@ class MangasController extends Controller implements HasMiddleware
             $request->user()->mangaVolumes()->create(['manga_id' => $manga->id, 'number' => $i]);
         }
 
-        return [
+        return response()->json([
             'status' => true,
-            'message' => "Manga created successfully"
-        ];
+            'message' => "Manga created successfully",
+            'data' => []
+        ]);
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/mangas/{manga_id}",
+     *     tags={"Mangas"},
+     *     summary="Show",
+     *     @OA\Parameter(
+     *          name="manga_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Return the requested manga"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *      @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function show(Manga $manga)
     {
-        return [$manga->load([
-            'authors',
-            'genres',
-            'publisher' => function ($query) {
-                $query->select(['id', 'name']);
-            }])];
+        return response()->json([
+            'status' => true,
+            'message' => 'Manga found successfully',
+            'data' => [
+                [
+                    $manga->load([
+                            'authors',
+                            'genres',
+                            'publisher'
+                    ])
+                ]
+            ]
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Patch(
+     *     path="/mangas/{manga_id}",
+     *     security={{"bearerAuth":{}}},
+     *     tags={"Mangas"},
+     *     summary="Update",
+     *     @OA\Parameter(
+     *          name="manga_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="on_going", type="int"),
+     *                  @OA\Property(property="civer", type="string"),
+     *                  @OA\Property(property="about", type="string"),
+     *                  @OA\Property(property="volumes", type="string"),
+     *              )       
+     *          )
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Author updated successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=499, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     *     @OA\Response(
+     *          response=500, 
+     *          description="Not allowed"
+     *      ),
+     * )
      */
     public function update(Request $request, Manga $manga)
     {
-        if(!$request->isAdmin) return response("You don't have permission to create mangas", 401);
-        
+        if(!$request->isAdmin) return response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to update mangas",
+                'data' => []
+            ],
+             499
+            );        
+
         $fields = $request->validate([
             'name'=> 'max:255',
             'on_going' => 'int',
