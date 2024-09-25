@@ -2,7 +2,6 @@
 
 namespace App\Observers;
 
-use App\Models\MangaVolume;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,9 +9,6 @@ class MangaObserver extends EntityObserver
 {
     public function creating(Model $model): void
     {
-        // throw new \Exception(json_encode($model), 401);
-
-
         Parent::creating($model);
     }
 

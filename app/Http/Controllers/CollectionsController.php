@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnauthorizedAccessException;
 use App\Models\Collection;
 use App\Models\CollectionVolume;
 use App\Models\MangaVolume;
@@ -171,9 +172,16 @@ class CollectionsController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        if(!$request->user()->hasVerifiedEmail()) return response("You have to verify your email to create a collection", 400);
-
-        $request->user()->collection()->create();
+        try{
+            $request->user()->collection()->create();
+        } catch (UnauthorizedAccessException $e){
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ],
+            $e->getCode());    
+        }
         return response()->json([
             'status' => true,
             'message' => "Collection started succesfully",
@@ -288,7 +296,7 @@ class CollectionsController extends Controller implements HasMiddleware
 
         } catch(\Exception $e){
             if($e->getCode() == 23000) return response('You already have this manga on your collection',500);
-            else return response($e->getMessage(), 500);
+            else return response($e->getMessage(), $e->getCode());
         }
 
         return [
