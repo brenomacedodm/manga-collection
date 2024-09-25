@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\PublishersController;
 use App\Http\Controllers\AuthorsController;
 use App\Http\Controllers\CollectionsController;
@@ -28,3 +29,7 @@ Route::post("/mangas/genres/{manga}", [MangasController::class, "updateGenres"])
 
 Route::post("/collections/addManga", [CollectionsController::class, "addManga"])->middleware("auth:sanctum");
 Route::post("/collections/addVolume", [CollectionsController::class, "addVolume"])->middleware("auth:sanctum");
+
+Route::post('email/verify/send', [VerifyEmailController::class,'sendMail'])->middleware("auth:sanctum");
+Route::post('email/verify', [VerifyEmailController::class,'verify'])->middleware("auth:sanctum")->name("verify-email");
+Route::get('email/verify', [VerifyEmailController::class,'verify'])->middleware("auth:sanctum")->name("verify-email");

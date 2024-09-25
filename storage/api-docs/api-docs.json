@@ -348,20 +348,6 @@
                 ],
                 "summary": "Index",
                 "operationId": "268bb61311f2db218a75ae6a92852422",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Parameter that set the page",
-                        "required": false
-                    },
-                    {
-                        "name": "page_size",
-                        "in": "query",
-                        "description": "Parameter that set the size of the result collection",
-                        "required": false
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "List all volumes of a mangas and indicates if each is in your collection"

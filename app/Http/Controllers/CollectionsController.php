@@ -109,18 +109,6 @@ class CollectionsController extends Controller implements HasMiddleware
      *     tags={"Collections"},
      *     security={{"bearerAuth":{}}},
      *     summary="Index",
-     *     @OA\Parameter(
-     *          name="page",
-     *          in="query",
-     *          description="Parameter that set the page",
-     *          required=false,
-     *      ),
-     *     @OA\Parameter(
-     *          name="page_size",
-     *          in="query",
-     *          description="Parameter that set the size of the result collection",
-     *          required=false,
-     *      ),
      *     @OA\Response(
      *          response=200, 
      *          description="List all volumes of a mangas and indicates if each is in your collection"
@@ -139,12 +127,6 @@ class CollectionsController extends Controller implements HasMiddleware
         $collection = $request->user()->collection->mangas()->where('mangas.id', $manga);
         $collectionId = $request->user()->collection['id'];
 
-        $conditions = "%";
-        $pageSize = 25;
-
-        if($request->has("page_size")){
-            $pageSize = $request->page_size > 0 ? $request->page_size : 25;
-        }
 
         $mangas = $collection->with([
             'authors',
@@ -159,7 +141,7 @@ class CollectionsController extends Controller implements HasMiddleware
             $mangas->orderBy($request->ordering[0] != '-' ? $request->ordering : str_replace('-', '' , $request->ordering), $request->ordering[0] != '-' ? 'asc' : 'desc');
         }
 
-        return $mangas->paginate($pageSize);
+        return $mangas->paginate();
     
     }
 
