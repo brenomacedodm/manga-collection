@@ -306,6 +306,50 @@ class CollectionsController extends Controller implements HasMiddleware
   
     }
 
+    /**
+     * @OA\Post(
+     *     path="/collections/addVolume",
+     *     security={{"bearerAuth":{}}},
+     *     tags={"Collections"},
+     *     summary="Add volumes to your collection",
+     *     description="Add the volumes from the indicated manga to your collection",
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(    
+     *              required={"name", "genre", "author", "publisher_id", "on_going", "volumes"},     
+     *              @OA\Property(property="manga", type="string", maxLength=255, example="1"),
+     *              @OA\Property(property="volumes", type="integer", example="[1,2]"),
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Manga added to your collection successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=422, 
+     *          description="Field Error"
+     *      ),
+     *     @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=499, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     *     @OA\Response(
+     *          response=498, 
+     *          description="Email not verified"
+     *      ),
+     * )
+     */
     public function addVolume(Request $request){
 
         if(!$request->user()->hasVerifiedEmail()) return response("You have to verify your email to create a collection", 498);
