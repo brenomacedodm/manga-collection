@@ -42,5 +42,8 @@ class Manga extends Model
         return $this->belongsTo(Publisher::class);
     }
 
+    public function collections(){
+        return $this->belongsToMany(Collection::class,'collection_manga');
+    }
     
 }

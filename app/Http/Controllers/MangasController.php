@@ -102,31 +102,66 @@ class MangasController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Manga $manga)
     {
+        if(!$request->isAdmin) return response("You don't have permission to create mangas", 401);
         
+        $fields = $request->validate([
+            'name'=> 'max:255',
+            'on_going' => 'int',
+            'cover' => 'max:255',
+            'about' => 'max:255',
+            'volumes' => 'int',
+        ]);
+
+        $manga->update($fields);
+
+        return [
+            'status' => true,
+            'message' => "Manga updated successfully"
+        ];
     }
     public function updateAuthors(Request $request, Manga $manga)
     {
+        if(!$request->isAdmin) return response("You don't have permission to update mangas", 401);
+
         $fields = $request->validate([
             'author' => 'required'
         ]);
 
         $manga->authors()->sync($fields['author']);
+
+        return [
+            'status' => true,
+            'message' => "Manga updated successfully"
+        ];
     }
     public function updateGenres(Request $request, Manga $manga)
     {
+        if(!$request->isAdmin) return response("You don't have permission to create mangas", 401);
+
         $fields = $request->validate([
-            'author' => 'required'
+            'genre' => 'required'
         ]);
 
+        $manga->genre()->sync($fields['genre']);
 
-        $manga->authors()->sync($fields);
+        return [
+            'status' => true,
+            'message' => "Manga updated successfully"
+        ];
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(mangas $mangas)
+    public function destroy(Request  $request, Manga $manga)
     {
-        //
+        if(!$request->isAdmin) return response("You don't have permission to delete mangas", 401);
+        
+        $manga->delete();
+        return [
+            'status'=> true,
+            'message'=> 'Manga deleted successfully'
+        ];
+
     }
 }

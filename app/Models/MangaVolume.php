@@ -27,4 +27,8 @@ class MangaVolume extends Model
     public function mangas(){
         return $this->belongsTo(Manga::class);
     }
+
+    public function collections(){
+        return $this->belongsToMany(Collection::class,'collection_volume');
+    }
 }

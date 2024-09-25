@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Author;
-use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -20,7 +19,13 @@ class AuthorsController extends Controller implements HasMiddleware
 
 
     /**
-     * Display a listing of the resource.
+     * @SWG\Get(
+     *     path="/authors",
+     *     summary="Get a list of authors",
+     *     tags={"Authors"},
+     *     @SWG\Response(response=200, description="list of authors"),
+     *     @SWG\Response(response=400, description="Invalid request")
+     * )
      */
     public function index(Request $request)
     {
