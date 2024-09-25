@@ -68,8 +68,35 @@ class UsersController extends Controller
         ]);
     }
 
-    public function verifyEmail(Request $request){
-        
+    public function changePassword(Request $request){
+        if(!$request->user()){
+            return response()->json([
+                'status' => false,
+                'message' => 'You must be logged to change your password', 
+                'data' => []
+            ]);
+        }
+
+        $fields = $request->validate([
+            'old_password' => 'required', 
+            'password' => 'required|confirmed'
+        ]);
+
+        if(Hash::check($fields['old_password'], $request->user()->password)){
+            $request->user()->forceFill([
+                "password" => Hash::make($fields['password'])
+            ])->save();
+
+            $request->user()->tokens()->delete();
+
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => "Your password was changed. You'll have to log in again", 
+            'data' => []
+        ]);
+
     }
 
     /**

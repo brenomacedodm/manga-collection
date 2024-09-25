@@ -22,6 +22,7 @@ Route::apiResource("mangaVolumes", MangaVolumesController::class)->middleware(Ch
 Route::post("/register", [UsersController::class, "register"]);
 Route::post("/login", [UsersController::class, "login"]);
 Route::post("/logout", [UsersController::class, "logout"])->middleware("auth:sanctum");
+Route::post("/changePassword", [UsersController::class, "changePassword"])->middleware("auth:sanctum");
 Route::post("/setAdmin/{user_id}", [UsersController::class, "setAdmin"])->middleware("auth:sanctum");
 
 Route::post("/mangas/authors/{manga}", [MangasController::class, "updateAuthors"])->middleware("auth:sanctum");
