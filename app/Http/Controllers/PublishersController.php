@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnauthorizedAccessException;
 use App\Models\Publisher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -115,23 +116,23 @@ class PublishersController extends Controller implements HasMiddleware
      * )
      */
     public function store(Request $request)
-    {
-
-        if(!$request->isAdmin) return response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to create publishers",
-                'data' => []
-            ],
-             499
-            );        
+    {       
 
         $fields = $request->validate([
             'name'=> 'required|max:255',
             'publisher_link' => 'max:255'
         ]);
 
-        $request->user()->publishers()->create($fields);
+        try{
+            $request->user()->publishers()->create($fields);
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ], $e->getCode());
+        }
+
         return response()->json([
             'status' => true,
             'message' => "Publisher created successfully",
@@ -224,21 +225,22 @@ class PublishersController extends Controller implements HasMiddleware
      * )
      */
     public function update(Request $request, Publisher $publisher)
-    {
-        if(!$request->isAdmin) return response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to update publishers",
-                'data' => []
-            ],
-             499
-            );         
+    {     
         $fields = $request->validate([
             'name'=> 'required|max:255',
             'publisher_link' => 'max:255'
         ]);
 
-        $publisher->update($fields);
+        try {
+            $publisher->update($fields);
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ], $e->getCode());
+        }
+        
         return response()->json([
             'status'=> true,	
             'message'=> 'Publisher updated successfully',
@@ -278,15 +280,15 @@ class PublishersController extends Controller implements HasMiddleware
      */
     public function destroy(Request $request, Publisher $publisher )
     {
-        if(!$request->isAdmin) return response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to delete publishers",
+        try{
+            $publisher->delete();
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
                 'data' => []
-            ],
-             499
-            ); 
-        $publisher->delete();
+            ], $e->getCode());
+        }
         return response()->json([
             'status'=> true,
             'message'=> 'Publisher deleted successfully',

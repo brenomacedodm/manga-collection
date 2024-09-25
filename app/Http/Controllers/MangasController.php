@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnauthorizedAccessException;
 use App\Models\Manga;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+
 
 class MangasController extends Controller implements HasMiddleware
 {
@@ -130,16 +132,6 @@ class MangasController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-
-        if(!$request->isAdmin) return response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to create mangas",
-                'data' => []
-            ],
-            499
-        );         
-
         $fields = $request->validate([
             'name'=> 'required|max:255',
             'genre' => 'required',
@@ -151,13 +143,16 @@ class MangasController extends Controller implements HasMiddleware
             'volumes' => 'required|integer',
         ]);
 
-
-        $manga = $request->user()->mangas()->create($fields);
-        $manga->authors()->attach($request->author);
-        $manga->genres()->attach($request->genre);
-
-        for($i = 1;$i <= $manga->volumes; $i++){
-            $request->user()->mangaVolumes()->create(['manga_id' => $manga->id, 'number' => $i]);
+        try{
+            $manga = $request->user()->mangas()->create($fields);
+            $manga->authors()->attach($request->author);
+            $manga->genres()->attach($request->genre);
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ], $e->getCode());
         }
 
         return response()->json([
@@ -263,15 +258,6 @@ class MangasController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Manga $manga)
     {
-        if(!$request->isAdmin) return response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to update mangas",
-                'data' => []
-            ],
-             499
-            );        
-
         $fields = $request->validate([
             'name'=> 'max:255',
             'on_going' => 'int',
@@ -280,7 +266,16 @@ class MangasController extends Controller implements HasMiddleware
             'volumes' => 'int',
         ]);
 
-        $manga->update($fields);
+        try {
+            $manga->update($fields);
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ], $e->getCode());
+        }
+
 
         if (isset($fields['volumes'])){
             $manga->volumes()->delete();
@@ -456,16 +451,15 @@ class MangasController extends Controller implements HasMiddleware
      */
     public function destroy(Request  $request, Manga $manga)
     {
-        if(!$request->isAdmin) return 
-        response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to delete mangas",
+        try{
+            $manga->delete();
+        } catch(\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
                 'data' => []
-            ],
-             499
-        );        
-        $manga->delete();
+            ], $e->getCode());
+        }
         return response()->json([
             'status'=> true,
             'message'=> 'Manga deleted successfully',

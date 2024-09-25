@@ -3,11 +3,13 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\User;
+
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MangaVolumes>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Genre>
  */
-class MangaVolumesFactory extends Factory
+class GenreFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,7 +19,8 @@ class MangaVolumesFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            "name" => $this->faker->name,
+            "user_id" => User::factory()
         ];
     }
 }

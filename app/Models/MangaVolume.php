@@ -10,6 +10,8 @@ class MangaVolume extends Model
     use HasFactory;
 
     protected $fillable = [
+        "manga_id",
+        "number"
     ];
 
     protected $hidden = [

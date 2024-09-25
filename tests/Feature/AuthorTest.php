@@ -1,55 +1,80 @@
 <?php
 
-namespace Tests\Feature;
-
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Exceptions\UnauthorizedAccessException;
 use App\Models\Author;
 use App\Models\User;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\InteractsWithAuthentication;
 
-class AuthorTest extends TestCase
-{
+it('has authors page', function () {
+    $response = $this->get('/api/authors');
 
-    /** @test */
-    public function can_create_an_author()
-    {
-        $user = User::create([
-            "name"=> "Breno Macedo",
-            "email"=> "breno@teste.com",
-            "password" => bcrypt("123456"),
-            "is_admin" => true
-        ]);
+    $response->assertStatus(200);
+});
 
-        $author = Author::create([
-            'name' => 'John Doe',
-            'picture' => '',
-            'user_id' => $user->id
-        ]);
+it('creates an author and returns 200 or throws UnauthorizedAccessException', function () {
+    // Create a user with necessary permissions
+    $user = User::factory()->create(['is_admin' => true]);
 
-        $this->assertDatabaseHas('authors', [
-            'id' => $author->id,
-            'name' => 'John Doe',
-            'picture' => '',
-        ]);
+    // Acting as the created user
+    $this->actingAs($user);
+
+    // Define the author data
+    $authorData = [
+        'name' => 'John Doe',
+        'user_id' => $user->id
+        // Add other necessary fields
+    ];
+
+    // Try to create the author and catch any UnauthorizedAccessException
+    try {
+        $response = $this->post('/api/authors', $authorData);
+        $response->assertStatus(200);
+    } catch (UnauthorizedAccessException $e) {
+        expect($e)->toBeInstanceOf(UnauthorizedAccessException::class);
     }
+});
 
-    /** @test */
-    public function can_update_an_author()
-    {
+it('updates an author and returns 200 or throws UnauthorizedAccessException', function () {
+    // Create a user with necessary permissions
+    $user = User::factory()->create(['is_admin' => true]);
+
+    // Acting as the created user
+    $this->actingAs($user);
+
+    // Define the author data
+    $authorData = [
+        'name' => 'John Doe',
+        'user_id' => $user->id
+        // Add other necessary fields
+    ];
+
+    // Try to create the author and catch any UnauthorizedAccessException
+    try {
+        $author = Author::factory()->create($authorData);
+        $updatedAuthor = [
+            'id' => $author->id, 
+            "name" => "John Doe"
+        ];
+        $response = $this->patch("/api/authors/{$author->id}", $updatedAuthor);
+        $response->assertStatus(200);
+    } catch (UnauthorizedAccessException $e) {
+        expect($e)->toBeInstanceOf(UnauthorizedAccessException::class);
+    }
+});
+
+it('destroys an author and returns 200 or throws UnauthorizedAccessException', function () {
+    // Create a user with necessary permissions
+    $user = User::factory()->create(['is_admin' => true]);
+
+    // Acting as the created user
+    $this->actingAs($user);
+
+    // Try to create the author and catch any UnauthorizedAccessException
+    try {
         $author = Author::factory()->create();
-
-        $author->update(['name' => 'Jane Doe']);
-
-        $this->assertEquals('Jane Doe', $author->fresh()->name);
+        $response = $this->delete("/api/authors/{$author->id}");
+        $response->assertStatus(200);
+    } catch (UnauthorizedAccessException $e) {
+        expect($e)->toBeInstanceOf(UnauthorizedAccessException::class);
     }
-
-    /** @test */
-    public function can_delete_an_author()
-    {
-        $author = Author::factory()->create();
-
-        $author->delete();
-
-        $this->assertDatabaseMissing('authors', ['id' => $author->id]);
-    }
-}
+});

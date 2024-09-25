@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnauthorizedAccessException;
 use App\Models\Author;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -119,21 +120,23 @@ class AuthorsController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        if(!$request->isAdmin) return response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to create authors",
-                'data' => []
-            ],
-             499
-            );
-
         $fields = $request->validate([
             'name'=> 'required|max:255',
             'picture' => 'max:255'
         ]);
 
-        $request->user()->authors()->create($fields);
+        try{
+            $request->user()->authors()->create($fields);
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json( 
+                    [
+                        "status" => false,
+                        'message' => $e->getMessage(),
+                        'data' => []
+                    ],
+                    $e->getCode()
+                    );
+        }
 
         return response()->json([
             'status' => true,
@@ -227,23 +230,24 @@ class AuthorsController extends Controller implements HasMiddleware
      * )
      */
     public function update(Request $request, Author $authors)
-    {
-        if(!$request->isAdmin) return 
-        response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to update authors",
-                'data' => []
-            ],
-             499
-        );
-        
+    {        
         $fields = $request->validate([
             'name'=> 'required|max:255',
             'picture' => 'max:255'
         ]);
 
-        $authors->update($fields);
+        try{
+            $authors->update($fields);
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json( 
+                [
+                    "status" => false,
+                    'message' => $e->getMessage(),
+                    'data' => []
+                ],
+                $e->getCode()
+            );
+        }
         return response()->json([
             'status' => true,	
             'message' => 'Author updated successfully',
@@ -283,16 +287,19 @@ class AuthorsController extends Controller implements HasMiddleware
      */
     public function destroy(Request $request, Author $authors)
     {
-        if(!$request->isAdmin) return 
-        response( 
-            [
+        try{
+            $authors->delete();
+        } catch (UnauthorizedAccessException $e) {
+            return response()->json(
+                [
                 "status" => false,
-                'message' => "You don't have permission to delete authors",
+                'message' => $e->getMessage(),
                 'data' => []
             ],
-             499
-        );
-        $authors->delete();
+            $e->getCode()
+            );
+        }
+
         return response()->json([
             'status'=> true,
             'message'=> 'Author deleted successfully',

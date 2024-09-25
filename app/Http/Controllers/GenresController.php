@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnauthorizedAccessException;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -152,22 +153,20 @@ class GenresController extends Controller implements HasMiddleware
      * )
      */
     public function store(Request $request)
-    {
-        if(!$request->isAdmin) return 
-        response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to create genres",
-                'data' => []
-            ],
-             499
-        );
-        
+    {        
         $fields = $request->validate([
             'name' => 'required|max:255'
         ]);
 
-        $request->user()->genres()->create($fields);
+        try{
+            $request->user()->genres()->create($fields);
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ], $e->getCode());
+        }
         return response()->json([
             'status' => true,
             'message' => "Genre created successfully",
@@ -221,24 +220,24 @@ class GenresController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Genre $genre)
     {
-        if(!$request->isAdmin) return 
-        response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to update genres",
-                'data' => []
-            ],
-             499
-        );
         
         $fields = $request->validate([
             'name'=> 'required|max:255',
         ]);
+        
+        try{
+            $genre->update($fields);
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ], $e->getCode());
+        }
 
-        $genre->update($fields);
         return response()->json([
             'status' => true,	
-            'message' => 'Publisher updated successfully',
+            'message' => 'Genre updated successfully',
             'data' => []
         ]);
     }
@@ -275,20 +274,19 @@ class GenresController extends Controller implements HasMiddleware
      */
     public function destroy(Request $request, Genre $genre)
     {
-        if(!$request->isAdmin) return 
-        response( 
-            [
-                "status" => false,
-                'message' => "You don't have permission to delete genres",
-                'data' => []
-            ],
-             499
-        );
 
-        $genre->delete();
+        try{
+            $genre->delete();
+        } catch(UnauthorizedAccessException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ], $e->getCode());
+        }
         return response()->json([
             'status' => true,
-            'message' => 'Publisher deleted successfully',
+            'message' => 'Genre deleted successfully',
             'data' => []
         ]);
     }

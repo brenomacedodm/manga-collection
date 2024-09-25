@@ -8,15 +8,7 @@ use Hash;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        return '';
-    }
-    
+{ 
     /**
      * @OA\Post(
      *     path="/register",

@@ -1,9 +1,5 @@
 <?php
 
-Pest::before(function () {
-    config()->set('database.default', 'testing');
-});
-
 /*
 |--------------------------------------------------------------------------
 | Test Case
