@@ -173,24 +173,26 @@ class UsersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+    public function setAdmin(Request $request, $id)
+    {  
+        if(!$request->isAdmin) return response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to give admin access",
+                'data' => []
+            ],
+             499
+            );
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, User $id)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $user = User::find($id);
+        $user->is_admin = 1;
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => "{$user['name']} is now an admin",
+            'data' => []
+        ]);
     }
 }
