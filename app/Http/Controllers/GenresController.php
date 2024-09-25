@@ -120,15 +120,10 @@ class GenresController extends Controller implements HasMiddleware
      *     tags={"Genres"},
      *     summary="Store",
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"name"},
-     *                  @OA\Property(property="name", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              required={"name"},
+     *              @OA\Property(property="name", type="string", example="Action"),
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 
@@ -173,10 +168,11 @@ class GenresController extends Controller implements HasMiddleware
         ]);
 
         $request->user()->genres()->create($fields);
-        return [
+        return response()->json([
             'status' => true,
-            'message' => "Genre created successfully"
-        ];
+            'message' => "Genre created successfully",
+            'data' => []
+        ]);
     }
 
     /**
@@ -192,17 +188,10 @@ class GenresController extends Controller implements HasMiddleware
      *          required=true,
      *      ),
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"name"},
-     *                  @OA\Property(property="name", type="string"),
-     *                  @OA\Property(property="picture", type="string"),
-     *                  @OA\Property(property="publisher_link", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              @OA\Property(property="name", type="string"),
+     *              required={"name"},
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 
@@ -247,11 +236,11 @@ class GenresController extends Controller implements HasMiddleware
         ]);
 
         $genre->update($fields);
-        return [
+        return response()->json([
             'status' => true,	
             'message' => 'Publisher updated successfully',
             'data' => []
-        ];
+        ]);
     }
 
     /**
@@ -297,10 +286,10 @@ class GenresController extends Controller implements HasMiddleware
         );
 
         $genre->delete();
-        return [
+        return response()->json([
             'status' => true,
             'message' => 'Publisher deleted successfully',
             'data' => []
-        ];
+        ]);
     }
 }

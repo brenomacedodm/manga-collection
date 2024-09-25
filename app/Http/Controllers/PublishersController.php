@@ -82,16 +82,11 @@ class PublishersController extends Controller implements HasMiddleware
      *     tags={"Publishers"},
      *     summary="Store",
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"name"},
-     *                  @OA\Property(property="name", type="string"),
-     *                  @OA\Property(property="publisher_link", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              required={"name"},
+     *              @OA\Property(property="name", type="string", example="Panini Mangas"),
+     *              @OA\Property(property="publisher_link", type="string", example="https://paninimangas.com.br"),
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 
@@ -196,16 +191,11 @@ class PublishersController extends Controller implements HasMiddleware
      *          required=true,
      *      ),
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"name"},
-     *                  @OA\Property(property="name", type="string"),
-     *                  @OA\Property(property="publisher_link", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              required={"name"},
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="publisher_link", type="string"),
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 

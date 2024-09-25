@@ -72,6 +72,7 @@ class MangasController extends Controller implements HasMiddleware
         $mangas = Manga::with([
             'authors',
             'genres',
+            'volumes',
             'publisher' => function ($query) {
                 $query->select(['id', 'name']);
             },
@@ -92,20 +93,17 @@ class MangasController extends Controller implements HasMiddleware
      *     tags={"Mangas"},
      *     summary="Store",
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"name"},
-     *                  @OA\Property(property="name", type="string"),
-     *                  @OA\Property(property="genre", type="array", @OA\Items(type="integer")),
-     *                  @OA\Property(property="author", type="integer"),
-     *                  @OA\Property(property="publisher_id", type="integer"),
-     *                  @OA\Property(property="on_going", type="boolean"),
-     *                  @OA\Property(property="volumes", type="integer")
-     *              )       
-     *          )
+     *          @OA\JsonContent(    
+     *              required={"name", "genre", "author", "publisher_id", "on_going", "volumes"},     
+     *              @OA\Property(property="name", type="string", maxLength=255, example="My Manga"),
+     *              @OA\Property(property="genre", type="integer", example="[1,2]"),
+     *              @OA\Property(property="author", type="integer", example="[1]"),
+     *              @OA\Property(property="publisher_id", type="integer", example=1),
+     *              @OA\Property(property="on_going", type="boolean", example=true),
+     *              @OA\Property(property="cover", type="string", maxLength=255, example="", description="Must be a base64 encoded image"),
+     *              @OA\Property(property="about", type="string", maxLength=255, example="A thrilling adventure..."),
+     *              @OA\Property(property="volumes", type="integer", example=3)  
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 
@@ -136,7 +134,6 @@ class MangasController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
 
-        
         if(!$request->isAdmin) return response( 
             [
                 "status" => false,
@@ -148,16 +145,15 @@ class MangasController extends Controller implements HasMiddleware
 
         $fields = $request->validate([
             'name'=> 'required|max:255',
-            'genre' => 'array|required',
+            'genre' => 'required',
             'author' => 'required',
             'publisher_id' => 'required',
-            'on_going' => 'int',
+            'on_going' => 'required|integer',
             'cover' => 'max:255',
             'about' => 'max:255',
-            'volumes' => 'required',
+            'volumes' => 'required|integer',
         ]);
 
-        return $fields;
 
         $manga = $request->user()->mangas()->create($fields);
         $manga->authors()->attach($request->author);
@@ -213,7 +209,8 @@ class MangasController extends Controller implements HasMiddleware
                     $manga->load([
                             'authors',
                             'genres',
-                            'publisher'
+                            'publisher',
+                            'volumes'
                     ])
                 ]
             ]
@@ -233,18 +230,13 @@ class MangasController extends Controller implements HasMiddleware
      *          required=true,
      *      ),
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  @OA\Property(property="name", type="string"),
-     *                  @OA\Property(property="on_going", type="int"),
-     *                  @OA\Property(property="civer", type="string"),
-     *                  @OA\Property(property="about", type="string"),
-     *                  @OA\Property(property="volumes", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="on_going", type="int"),
+     *              @OA\Property(property="cover", type="string"),
+     *              @OA\Property(property="about", type="string"),
+     *              @OA\Property(property="volumes", type="string"),
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 
@@ -293,11 +285,63 @@ class MangasController extends Controller implements HasMiddleware
 
         $manga->update($fields);
 
-        return [
+        if (isset($fields['volumes'])){
+            $manga->volumes()->delete();
+            for ($i = 1;$i <= (int)$fields['volumes']; $i++){
+                $request->user()->mangaVolumes()->create(['manga_id'=> $manga->id, 'number'=> $i]);
+            }
+        }
+
+        return response()->json([
             'status' => true,
-            'message' => "Manga updated successfully"
-        ];
+            'message' => "Manga updated successfully",
+            'data' => []
+        ]);
     }
+
+    /**
+     * @OA\Post(
+     *     path="/mangas/authors/{manga_id}",
+     *     security={{"bearerAuth":{}}},
+     *     tags={"Mangas"},
+     *     summary="Update Authors",
+     *     @OA\Parameter(
+     *          name="manga_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(
+     *              @OA\Property(property="author", type="array",@OA\Items(type="integer")),
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Manga-Author updated successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=499, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     *     @OA\Response(
+     *          response=500, 
+     *          description="Not allowed"
+     *      ),
+     * )
+     */
     public function updateAuthors(Request $request, Manga $manga)
     {
         if(!$request->isAdmin) return response("You don't have permission to update mangas", 401);
@@ -306,13 +350,62 @@ class MangasController extends Controller implements HasMiddleware
             'author' => 'required'
         ]);
 
+        if(!is_array($fields['author'])){
+            $fields['author'] = explode(',', $fields['author']);
+        }
+
         $manga->authors()->sync($fields['author']);
 
-        return [
+        return response()->json([
             'status' => true,
-            'message' => "Manga updated successfully"
-        ];
+            'message' => "Manga updated successfully",
+            'data' => []
+        ]);
     }
+
+    /**
+     * @OA\Post(
+     *     path="/mangas/genres/{manga_id}",
+     *     security={{"bearerAuth":{}}},
+     *     tags={"Mangas"},
+     *     summary="Update Genres",
+     *     @OA\Parameter(
+     *          name="manga_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(
+     *              @OA\Property(property="genre", type="array",@OA\Items(type="integer")),
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Manga-Genre updated successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *     @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=499, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     *     @OA\Response(
+     *          response=500, 
+     *          description="Not allowed"
+     *      ),
+     * )
+     */
     public function updateGenres(Request $request, Manga $manga)
     {
         if(!$request->isAdmin) return response("You don't have permission to create mangas", 401);
@@ -321,26 +414,66 @@ class MangasController extends Controller implements HasMiddleware
             'genre' => 'required'
         ]);
 
+        if(!is_array($fields['genre'])){
+            $fields['genre'] = explode(',', $fields['genre']);
+        }
+
         $manga->genre()->sync($fields['genre']);
 
-        return [
+        return response()->json([
             'status' => true,
-            'message' => "Manga updated successfully"
-        ];
+            'message' => "Manga updated successfully",
+            'data' => []
+        ]);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/mangas/{manga_id}",
+     *     tags={"Mangas"},     
+     *     security={{"bearerAuth":{}}},
+     *     summary="Destroy",
+     *     @OA\Parameter(
+     *          name="manga_id",
+     *          in="path",
+     *          description="Parameter that filter the entity",
+     *          required=true,
+     *      ),
+     *     @OA\Response(
+     *          response=200, 
+     *          description="Manga deleted successfully"
+     *      ),
+     *     @OA\Response(
+     *          response=400, 
+     *          description="Bad request"
+     *      ),
+     *      @OA\Response(
+     *          response=401, 
+     *          description="Not allowed"
+     *      ),
+     *     @OA\Response(
+     *          response=404, 
+     *          description="Resource Not Found"
+     *      ),
+     * )
      */
     public function destroy(Request  $request, Manga $manga)
     {
-        if(!$request->isAdmin) return response("You don't have permission to delete mangas", 401);
-        
+        if(!$request->isAdmin) return 
+        response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to delete mangas",
+                'data' => []
+            ],
+             499
+        );        
         $manga->delete();
-        return [
+        return response()->json([
             'status'=> true,
-            'message'=> 'Manga deleted successfully'
-        ];
+            'message'=> 'Manga deleted successfully',
+            'data' => []
+        ]);
 
     }
 }

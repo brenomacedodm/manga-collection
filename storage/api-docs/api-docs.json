@@ -9,6 +9,10 @@
         {
             "url": "http://127.0.0.1:8000/api",
             "description": "local server"
+        },
+        {
+            "url": "https://pink-buffalo-749567.hostingersite.com/api",
+            "description": "production server"
         }
     ],
     "paths": {
@@ -59,24 +63,23 @@
                 "operationId": "a05b6d79ca79b1d32c3651f1ced437b7",
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
                                     "name"
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Akira Amano"
                                     },
                                     "picture": {
+                                        "description": "Must be a base64 encoded image",
                                         "type": "string"
                                     }
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
@@ -187,24 +190,24 @@
                 ],
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
                                     "name"
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Osamu Tezuka"
                                     },
                                     "picture": {
+                                        "description": "Must be a base64 encoded image",
                                         "type": "string"
                                     }
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
@@ -282,21 +285,19 @@
                 "operationId": "9bd20b05d63f461c6457722421e36470",
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
                                     "name"
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Action"
                                     }
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
@@ -407,7 +408,7 @@
                 ],
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
                                     "name"
@@ -415,19 +416,10 @@
                                 "properties": {
                                     "name": {
                                         "type": "string"
-                                    },
-                                    "picture": {
-                                        "type": "string"
-                                    },
-                                    "publisher_link": {
-                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
@@ -505,39 +497,56 @@
                 "operationId": "c62e72b8310de4e563424a0a502bccaf",
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
-                                    "name"
+                                    "name",
+                                    "genre",
+                                    "author",
+                                    "publisher_id",
+                                    "on_going",
+                                    "volumes"
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "My Manga"
                                     },
                                     "genre": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        }
+                                        "type": "integer",
+                                        "example": "[1,2]"
                                     },
                                     "author": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "example": "[1]"
                                     },
                                     "publisher_id": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "on_going": {
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "cover": {
+                                        "description": "Must be a base64 encoded image",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": ""
+                                    },
+                                    "about": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "A thrilling adventure..."
                                     },
                                     "volumes": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "example": 3
                                     }
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
@@ -598,6 +607,40 @@
                     }
                 }
             },
+            "delete": {
+                "tags": [
+                    "Mangas"
+                ],
+                "summary": "Destroy",
+                "operationId": "1002de421bd33a614e27dfff5e938a4a",
+                "parameters": [
+                    {
+                        "name": "manga_id",
+                        "in": "path",
+                        "description": "Parameter that filter the entity",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Manga deleted successfully"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Not allowed"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "patch": {
                 "tags": [
                     "Mangas"
@@ -614,7 +657,7 @@
                 ],
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "properties": {
                                     "name": {
@@ -623,7 +666,7 @@
                                     "on_going": {
                                         "type": "integer"
                                     },
-                                    "civer": {
+                                    "cover": {
                                         "type": "string"
                                     },
                                     "about": {
@@ -635,15 +678,130 @@
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
                 "responses": {
                     "200": {
                         "description": "Author updated successfully"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Not allowed"
+                    },
+                    "499": {
+                        "description": "Not allowed"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Not allowed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/mangas/authors/{manga_id}": {
+            "post": {
+                "tags": [
+                    "Mangas"
+                ],
+                "summary": "Update Authors",
+                "operationId": "f6a964be388d3ea1fc35ca820cfaae51",
+                "parameters": [
+                    {
+                        "name": "manga_id",
+                        "in": "path",
+                        "description": "Parameter that filter the entity",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "author": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Manga-Author updated successfully"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Not allowed"
+                    },
+                    "499": {
+                        "description": "Not allowed"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Not allowed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/mangas/genres/{manga_id}": {
+            "post": {
+                "tags": [
+                    "Mangas"
+                ],
+                "summary": "Update Genres",
+                "operationId": "83cbe5c54fc3e2305df829e64d5a2b76",
+                "parameters": [
+                    {
+                        "name": "manga_id",
+                        "in": "path",
+                        "description": "Parameter that filter the entity",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "genre": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Manga-Genre updated successfully"
                     },
                     "400": {
                         "description": "Bad request"
@@ -715,24 +873,23 @@
                 "operationId": "a3f49897d9714e054d19ad1b74b963b7",
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
                                     "name"
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Panini Mangas"
                                     },
                                     "publisher_link": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "https://paninimangas.com.br"
                                     }
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
@@ -843,7 +1000,7 @@
                 ],
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
                                     "name"
@@ -858,9 +1015,6 @@
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
@@ -900,7 +1054,7 @@
                 "operationId": "6d8088a3d3a99f8813bd3b743e4c178c",
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
                                     "name",
@@ -924,9 +1078,6 @@
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
@@ -955,7 +1106,7 @@
                 "operationId": "48bcf686efbed40e2cce762143183d40",
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
                                     "email",
@@ -971,9 +1122,6 @@
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },
@@ -1002,7 +1150,7 @@
                 "operationId": "654ead0835974640895d439949a6d785",
                 "requestBody": {
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
                                     "email",
@@ -1018,9 +1166,6 @@
                                 },
                                 "type": "object"
                             }
-                        },
-                        "application/json": {
-                            "schema": {}
                         }
                     }
                 },

@@ -85,16 +85,11 @@ class AuthorsController extends Controller implements HasMiddleware
      *     tags={"Authors"},
      *     summary="Store",
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"name"},
-     *                  @OA\Property(property="name", type="string"),
-     *                  @OA\Property(property="picture", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              required={"name"},
+     *              @OA\Property(property="name", type="string", example="Akira Amano"),
+     *              @OA\Property(property="picture", type="string", description="Must be a base64 encoded image"),
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 
@@ -199,16 +194,11 @@ class AuthorsController extends Controller implements HasMiddleware
      *          required=true,
      *      ),
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"name"},
-     *                  @OA\Property(property="name", type="string"),
-     *                  @OA\Property(property="picture", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              @OA\Property(property="name", type="string", maxLength=255, example="Osamu Tezuka"),
+     *              @OA\Property(property="picture", type="string", description="Must be a base64 encoded image"),
+     *              required={"name"},
+     *           ),
      *      ),
      *     @OA\Response(
      *          response=200, 
@@ -254,11 +244,11 @@ class AuthorsController extends Controller implements HasMiddleware
         ]);
 
         $authors->update($fields);
-        return [
+        return response()->json([
             'status' => true,	
             'message' => 'Author updated successfully',
             'data' => []
-        ];
+        ]);
     }
 
     /**
@@ -293,13 +283,20 @@ class AuthorsController extends Controller implements HasMiddleware
      */
     public function destroy(Request $request, Author $authors)
     {
-        if(!$request->is_admin) return response("You don't have permission to delete authors", 401);
-
+        if(!$request->isAdmin) return 
+        response( 
+            [
+                "status" => false,
+                'message' => "You don't have permission to delete authors",
+                'data' => []
+            ],
+             499
+        );
         $authors->delete();
-        return [
+        return response()->json([
             'status'=> true,
             'message'=> 'Author deleted successfully',
             'data' => []
-        ];
+        ]);
     }
 }

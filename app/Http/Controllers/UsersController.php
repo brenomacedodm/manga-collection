@@ -23,18 +23,13 @@ class UsersController extends Controller
      *     tags={"Users"},
      *     summary="Register",
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"name", "email", "password", "password_confirmation"},
-     *                  @OA\Property(property="name", type="string"),
-     *                  @OA\Property(property="email", type="string"),
-     *                  @OA\Property(property="password", type="string"),
-     *                  @OA\Property(property="password_confirmation", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              required={"name", "email", "password", "password_confirmation"},
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="email", type="string"),
+     *              @OA\Property(property="password", type="string"),
+     *              @OA\Property(property="password_confirmation", type="string"),
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 
@@ -83,16 +78,11 @@ class UsersController extends Controller
      *     tags={"Users"},
      *     summary="Login",
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"email", "password"},
-     *                  @OA\Property(property="email", type="string"),
-     *                  @OA\Property(property="password", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              required={"email", "password"},
+     *              @OA\Property(property="email", type="string"),
+     *              @OA\Property(property="password", type="string"),
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 
@@ -145,16 +135,11 @@ class UsersController extends Controller
      *     tags={"Users"},
      *     summary="Logout",
      *     @OA\RequestBody(
-     *          @OA\JsonContent(),
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  type="object",
-     *                  required={"email", "password"},
-     *                  @OA\Property(property="email", type="string"),
-     *                  @OA\Property(property="password", type="string"),
-     *              )       
-     *          )
+     *          @OA\JsonContent(
+     *              required={"email", "password"},
+     *              @OA\Property(property="email", type="string"),
+     *              @OA\Property(property="password", type="string"),
+     *          ),
      *      ),
      *     @OA\Response(
      *          response=200, 
