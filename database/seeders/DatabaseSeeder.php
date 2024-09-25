@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MangasSeeder::class);
         $this->call(AuthorMangaSeeder::class);
         $this->call(MangaGenreSeeder::class);
-        $this->call(MangaVolumesSeeder::class);
+        // $this->call(MangaVolumesSeeder::class);
         $this->call(CollectionSeeder::class);
         $this->call(CollectionMangaSeeder::class);
     }

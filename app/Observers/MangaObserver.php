@@ -19,9 +19,6 @@ class MangaObserver extends EntityObserver
         for ($i = 1; $i <= (int)$new->volumes; $i++){
             DB::insert("insert into manga_volumes (number, manga_id, user_id) values (?, ?, ?)", [$i, $new->id, $new->user_id]);
         }
-
-        throw new \Exception(json_encode($volumes), 401);
-
     }
 
     public function updating(Model $manga): void{
