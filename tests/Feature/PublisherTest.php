@@ -53,13 +53,10 @@ it('updates an publisher and returns 200 or throws UnauthorizedAccessException',
 });
 
 it('destroys an publisher and returns 200 or throws UnauthorizedAccessException', function () {
-    // Create a user with necessary permissions
     $user = User::factory()->create(['is_admin' => true]);
 
-    // Acting as the created user
     $this->actingAs($user);
 
-    // Try to create the publisher and catch any UnauthorizedAccessException
     try {
         $publisher = Publisher::factory()->create();
         $response = $this->delete("/api/publishers/{$publisher->id}");

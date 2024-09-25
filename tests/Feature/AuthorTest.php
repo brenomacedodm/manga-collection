@@ -12,20 +12,15 @@ it('has authors page', function () {
 });
 
 it('creates an author and returns 200 or throws UnauthorizedAccessException', function () {
-    // Create a user with necessary permissions
     $user = User::factory()->create(['is_admin' => true]);
 
-    // Acting as the created user
     $this->actingAs($user);
 
-    // Define the author data
     $authorData = [
         'name' => 'John Doe',
         'user_id' => $user->id
-        // Add other necessary fields
     ];
 
-    // Try to create the author and catch any UnauthorizedAccessException
     try {
         $response = $this->post('/api/authors', $authorData);
         $response->assertStatus(200);
@@ -35,20 +30,15 @@ it('creates an author and returns 200 or throws UnauthorizedAccessException', fu
 });
 
 it('updates an author and returns 200 or throws UnauthorizedAccessException', function () {
-    // Create a user with necessary permissions
     $user = User::factory()->create(['is_admin' => true]);
 
-    // Acting as the created user
     $this->actingAs($user);
 
-    // Define the author data
     $authorData = [
         'name' => 'John Doe',
         'user_id' => $user->id
-        // Add other necessary fields
     ];
 
-    // Try to create the author and catch any UnauthorizedAccessException
     try {
         $author = Author::factory()->create($authorData);
         $updatedAuthor = [
@@ -63,13 +53,10 @@ it('updates an author and returns 200 or throws UnauthorizedAccessException', fu
 });
 
 it('destroys an author and returns 200 or throws UnauthorizedAccessException', function () {
-    // Create a user with necessary permissions
     $user = User::factory()->create(['is_admin' => true]);
 
-    // Acting as the created user
     $this->actingAs($user);
 
-    // Try to create the author and catch any UnauthorizedAccessException
     try {
         $author = Author::factory()->create();
         $response = $this->delete("/api/authors/{$author->id}");

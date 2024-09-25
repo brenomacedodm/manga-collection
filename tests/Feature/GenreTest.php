@@ -53,13 +53,10 @@ it('updates an genre and returns 200 or throws UnauthorizedAccessException', fun
 });
 
 it('destroys an genre and returns 200 or throws UnauthorizedAccessException', function () {
-    // Create a user with necessary permissions
     $user = User::factory()->create(['is_admin' => true]);
 
-    // Acting as the created user
     $this->actingAs($user);
 
-    // Try to create the genre and catch any UnauthorizedAccessException
     try {
         $genre = Genre::factory()->create();
         $response = $this->delete("/api/genres/{$genre->id}");

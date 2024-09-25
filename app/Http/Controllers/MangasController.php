@@ -276,14 +276,6 @@ class MangasController extends Controller implements HasMiddleware
             ], $e->getCode());
         }
 
-
-        if (isset($fields['volumes'])){
-            $manga->volumes()->delete();
-            for ($i = 1;$i <= (int)$fields['volumes']; $i++){
-                $request->user()->mangaVolumes()->create(['manga_id'=> $manga->id, 'number'=> $i]);
-            }
-        }
-
         return response()->json([
             'status' => true,
             'message' => "Manga updated successfully",
@@ -453,7 +445,7 @@ class MangasController extends Controller implements HasMiddleware
     {
         try{
             $manga->delete();
-        } catch(\Exception $e) {
+        } catch(UnauthorizedAccessException $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),
