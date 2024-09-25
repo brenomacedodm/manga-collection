@@ -55,3 +55,23 @@ Para testes locais para a verificação de email utilizei o https://mailtrap.io
 Foi utilizado o login com google. As credenciais utilizadas para teste estão no .env.example, mas caso não funcionem segue email e senha do gmail, para pegar novas credenciais.
 email: mangacollection95@gmail.com
 senha: senha123!
+
+Instalação do Banco de dados local: 
+
+Download do XAMPP:
+Acesse o site oficial do XAMPP: https://www.apachefriends.org/index.html
+Selecione a versão adequada para o seu sistema operacional (Windows, macOS ou Linux) e a arquitetura (32 bits ou 64 bits).
+Clique no botão de download.
+
+Execução do Instalador:
+Localize o arquivo baixado e execute-o.
+Siga as instruções do instalador. As opções padrão geralmente são suficientes para a maioria dos usuários.
+Importante: Marque a opção para instalar o MySQL durante a instalação.
+
+Iniciando os Serviços:
+Após a instalação, abra o painel de controle do XAMPP.
+Inicie os serviços Apache e MySQL clicando nos botões correspondentes.
+
+Verificando a Instalação:
+Abra um navegador e digite http://localhost para acessar a página inicial do Apache.
+Acesse o phpMyAdmin digitando http://localhost/phpmyadmin. Você será solicitado a inserir suas credenciais. O usuário padrão é root e a senha geralmente é em branco na primeira instalação.

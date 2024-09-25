@@ -210,7 +210,7 @@ class UsersController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => "{$user['name']} is now an admin",
+            'message' => "{$user->name} is now an admin",
             'data' => []
         ]);
     }
