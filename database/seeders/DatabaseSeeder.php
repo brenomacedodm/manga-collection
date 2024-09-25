@@ -15,10 +15,15 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'is_admin' => 1
-        ]);
+        $this->call(UsersSeeder::class);
+        $this->call(AuthorsSeeder::class);
+        $this->call(GenresSeeder::class);
+        $this->call(PublishersSeeder::class);
+        $this->call(MangasSeeder::class);
+        $this->call(AuthorMangaSeeder::class);
+        $this->call(MangaGenreSeeder::class);
+        $this->call(MangaVolumesSeeder::class);
+        $this->call(CollectionSeeder::class);
+        $this->call(CollectionMangaSeeder::class);
     }
 }

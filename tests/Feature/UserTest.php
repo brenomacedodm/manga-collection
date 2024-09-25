@@ -7,34 +7,28 @@ use App\Models\Author;
 use App\Models\User;
 use Tests\TestCase;
 
-class AuthorTest extends TestCase
+class UserTest extends TestCase
 {
 
     /** @test */
-    public function can_create_an_author()
+    public function can_create_a_user()
     {
         $user = User::create([
-            "name"=> "Breno Macedo",
-            "email"=> "breno@teste.com",
+            "name"=> "John Doe",
+            "email"=> "JohnDoe@teste.com",
             "password" => bcrypt("123456"),
             "is_admin" => true
         ]);
 
-        $author = Author::create([
-            'name' => 'John Doe',
-            'picture' => '',
-            'user_id' => $user->id
-        ]);
 
-        $this->assertDatabaseHas('authors', [
-            'id' => $author->id,
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
             'name' => 'John Doe',
-            'picture' => '',
         ]);
     }
 
     /** @test */
-    public function can_update_an_author()
+    public function can_update_a_user()
     {
         $author = Author::factory()->create();
 
