@@ -30,7 +30,7 @@ Testes: A aplicação possui uma cobertura de testes completa utilizando o frame
 Como Executar o Projeto
 Clonar o repositório:
 
-git clone https://seu-repositorio.git manga-collection
+git clone https://github.com/brenomacedodm/manga-collection.git manga-collection
 
 
 Instalar as dependências:
@@ -49,5 +49,9 @@ Iniciar o servidor de desenvolvimento:
 
 php artisan serve
 
-
 Acessar a documentação da API: Acesse a URL da sua aplicação seguida de /api/documentation.
+
+Para testes locais para a verificação de email utilizei o https://mailtrap.io
+Foi utilizado o login com google. As credenciais utilizadas para teste estão no .env.example, mas caso não funcionem segue email e senha do gmail, para pegar novas credenciais.
+email: mangacollection95@gmail.com
+senha: senha123!
