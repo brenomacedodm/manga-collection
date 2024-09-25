@@ -20,7 +20,7 @@ class EmailVerification extends Mailable
      */
     public function __construct($user)
     {
-        $generate = \URL::temporarySignedRoute('verify-email', now()->addMinute(60), ['email' => $user->email]);
+        $generate = \URL::temporarySignedRoute('verify-email', now()->addMinutes(60), ['email' => $user->email]);
         $this->url =  $generate;
     }
 
