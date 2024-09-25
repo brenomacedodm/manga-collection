@@ -13,8 +13,6 @@ class CollectionSeeder extends Seeder
      */
     public function run(): void
     {
-        Collection::create([
-            "user_id" => 2
-        ]);
+
     }
 }

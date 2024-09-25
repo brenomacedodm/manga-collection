@@ -13,13 +13,5 @@ class CollectionMangaSeeder extends Seeder
      */
     public function run(): void
     {
-        CollectionManga::create([
-            "manga_id" => 8,
-            "collection_id" => 1
-        ]);
-        CollectionManga::create([
-            "manga_id" => 9,
-            "collection_id" => 1
-        ]);
     }
 }
