@@ -1,6 +1,9 @@
 Visão Geral:
 O projeto Manga Collection foi desenvolvido como um teste técnico para a empresa Capyba, com o objetivo de demonstrar habilidades em Laravel, desenvolvimento de APIs e boas práticas de desenvolvimento. A aplicação permite gerenciar informações sobre mangás, autores, gêneros, volumes e usuários.
 
+Aviso:
+    Envio de email não está funcionando em produção pois não adquiri um domínio.
+
 Tecnologias Utilizadas
     Laravel: Framework PHP para desenvolvimento web.
     Swagger: Ferramenta para documentar APIs RESTful.
